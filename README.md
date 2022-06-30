@@ -51,8 +51,9 @@ from prefect import flow
 def basic_api_call(url):
     return requests.get(url).json()
 
-state = basic_api_call('https://api.github.com')
-print(state.result())
+if __name__ == "__main__":
+    state = basic_api_call('https://api.github.com')
+    print(state.result())
 ```
 
 To run this as a script, simply:
@@ -96,7 +97,8 @@ def api_flow(url):
     json = call_api(url)
     print_keys(json)
 
-api_flow('https://api.github.com')
+if __name__ == "__main__":
+    api_flow('https://api.github.com')
 ```
 
 Again, run with:
@@ -139,7 +141,8 @@ def async_flow():
     ans2 = count_two()
     return
 
-async_flow()
+if __name__ == "__main__":
+    async_flow()
 ```
 
 Run the flow with:

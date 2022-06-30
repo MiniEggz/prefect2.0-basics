@@ -20,4 +20,8 @@ def api_flow(url):
     json = call_api(url)
     print_keys(json)
 
-api_flow('https://api.github.com')
+def main():
+    state = api_flow('https://api.github.com')
+
+if __name__ == "__main__":
+    main()

@@ -19,7 +19,11 @@ def async_flow():
     ans2 = count_two()
     return
 
-async_flow()
+def main():
+    async_flow()
+
+if __name__ == "__main__":
+    main()
 
 # when run can see that they are running together
 # blocks of +ve and -ve counts...
