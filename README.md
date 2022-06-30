@@ -1,20 +1,37 @@
 # Prefect 2.0
-  
-## Setting up Prefect 2.0 locally and running basic scripts
 
-### Start by getting virutal environment set up (conda, venv and virtualenv seem like the best choices when using Prefect):
+### Sections
+* [Setting up Prefect 2.0 locally](#local-setup)
+* [Setting up Prefect 2.0 cloud](#cloud-setup)
+
+<br>
+
+# <a name="local-setup"></a>  Setting up Prefect 2.0 locally and running basic scripts
+
+## Setting up virtual environment (using virtualenv)
+Conda and venv are also compatible with Prefect 2.0.
+
+<br>
+
 Create folder with clean copy of python:
+
 ```
 $ virtualenv ./{dir_name}
 ```
+
 cd into project directory:
+
 ```
 $ cd {dir_name}
 ```
+
 Activate the environment:
+
 ```
 $ source ./bin/activate
 ```
+
+<br>
 
 ## Installing Prefect 2.0
 To install the latest version of 2.0:
@@ -26,15 +43,22 @@ Check installation with
 $ prefect version
 ```
 
-## Installing requests for use in tests
+<br>
+
+## Installing requests for use in starter scripts
+
 ```
 pip install requests
 ```
 
+<br>
+
 ## Basic example of using flows in Prefect 2.0
 
 The first is just an example of a simple flow interacting with the GitHub API.
-\
+
+<br>
+
 Create a python file, for example:
 
 ```
@@ -61,6 +85,8 @@ To run this as a script, simply:
 ```
 $ python3 flow_example.py
 ```
+
+<br>
 
 ## Looking at using tasks within flows
 
@@ -101,16 +127,20 @@ if __name__ == "__main__":
     api_flow('https://api.github.com')
 ```
 
-Again, run with:
+Run with:
 
 ```
 $ python3 tasks_example.py
 ```
 
+<br>
+
 ## Looking at running tasks asychronously
 
 Prefect 2.0 uses task runners that can run sequentially or concurrently. To illustrate this, this example shows two counts (one negative and one positive) to show that both tasks are being carried out at the same time.
-\
+
+<br>
+
 Create a python file:
 
 ```
@@ -146,6 +176,74 @@ if __name__ == "__main__":
 ```
 
 Run the flow with:
+
+```
+$ python3 duel_count.py
+```
+
+<br>
+
+# <a name="cloud-setup"></a> Getting started with Prefect cloud 2.0
+Setting up Prefect 2.0 cloud is just a continuation of having it set up locally.
+
+## Set up account
+Go to [beta.prefect.io](https://beta.prefect.io) and set up Prefect 2.0 account (separate from Prefect 1.0). After doing this, you should be prompted to set up a workspace.
+
+<br>
+
+## Generate API key
+Generate an API key by going to [beta.prefect.io/profile/api-keys](beta.prefect.io/profile/api-keys), add an API key, name it, set an expiration date and then save it.
+
+<br>
+
+## Creating and using prefect profiles
+Prefect profiles are good to switch between local work and work using Prefect cloud, or between different workspaces on the cloud. To set up profiles up using:
+
+```
+$ prefect profile create {profile-name}
+```
+
+To change profile, use:
+
+```
+$ prefect profile use {profile-name}
+```
+
+All profiles are stored in /Users/{user-name}/.prefect/profiles.toml. To list them, simply:
+
+```
+$ cat ~/.prefect/profiles.toml
+```
+
+<br>
+
+## Configuring prefect profiles
+To configure the API key, activate the correct prefect profile and then:
+
+```
+$ prefect config set PREFECT_API_KEY=XXXX
+```
+
+Add the PREFECT_API_URL to the profile:
+
+```
+$ prefect cloud workspace set --workspace "{email-without-special-characters}/{workspace-slug}"
+```
+
+This command can also be found by going into your workspace at [beta.prefect.io](https://beta.prefect.io) and going to 'Workspace Settings'.
+
+<br>
+
+To check that everything has worked correctly, inspect the current profile:
+
+```
+$ prefect profile inspect {profile-name}
+```
+
+<br>
+
+## Run something
+Now just run any script using prefect and that history will be logged on Prefect cloud.
 
 ```
 $ python3 duel_count.py
