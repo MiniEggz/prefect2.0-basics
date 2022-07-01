@@ -19,11 +19,11 @@ def duel_count():
     ans2 = count_two()
     return
 
-def main():
-    duel_count()
+from prefect.flow_runners import SubprocessFlowRunner
+from prefect.deployments import DeploymentSpec
 
-if __name__ == "__main__":
-    main()
-
-# when run can see that they are running together
-# blocks of +ve and -ve counts...
+DeploymentSpec(
+    flow_location="duel_count_flow.py",
+    name="duel-count-deployment",
+    flow_runner=SubprocessFlowRunner(),
+)

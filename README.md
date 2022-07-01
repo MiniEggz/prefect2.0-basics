@@ -3,6 +3,7 @@
 ### Sections
 * [Setting up Prefect 2.0 locally](#local-setup)
 * [Setting up Prefect 2.0 cloud](#cloud-setup)
+* [Working with deployments](#deployments)
 
 <br>
 
@@ -166,13 +167,13 @@ def count_two():
     return 43
 
 @flow(task_runner=ConcurrentTaskRunner)
-def async_flow():
+def duel_count():
     ans1 = count_one()
     ans2 = count_two()
     return
 
 if __name__ == "__main__":
-    async_flow()
+    duel_count()
 ```
 
 Run the flow with:
@@ -248,3 +249,109 @@ Now just run any script using prefect and that history will be logged on Prefect
 ```
 $ python3 duel_count.py
 ```
+
+<br>
+
+# Working with deployments (locally)
+Deployments encapsulate a flow and this allows it to be scheduled and triggered via the API. More on this can be found [here](https://orion-docs.prefect.io/concepts/deployments/).
+
+<br>
+
+## Adding deployment specification
+Assuming a flow has already been written, to create a deployment, the script needs to first be modified.
+With duel_count.py as the starting point:
+
+```
+from prefect import flow, task
+from prefect.task_runners import ConcurrentTaskRunner
+
+@task
+def count_one():
+    for i in range(1,1000000):
+        print(i)
+    return 42
+
+@task
+def count_two():
+    for i in range(-1000000,0):
+        print(i)
+    return 43
+
+@flow(task_runner=ConcurrentTaskRunner)
+def duel_count():
+    ans1 = count_one()
+    ans2 = count_two()
+    return
+```
+
+The deployment object needs to be defined:
+
+```
+from prefect.flow_runners import SubprocessFlowRunner
+from prefect.deployments import DeploymentSpec
+
+DeploymentSpec(
+    flow_location="duel_count_flow.py",
+    name="duel-count-deployment",
+    flow_runner=SubprocessFlowRunner(),
+)
+```
+
+The SubProcessFlowRunner is useful when running things locally as there is less configuration. The UniversalFlowRunner (default option), for example, requires remote storage.
+
+<br>
+
+## Example using parameters
+Using basic.py as an example this time, we start with the code:
+
+```
+import requests
+from prefect import flow
+
+@flow
+def basic_func():
+    print("Something done here...")
+    return 152
+
+@flow
+def basic_api_call(url):
+    return requests.get(url).json()
+```
+
+Because there are multiple flows and because there is a parameter involved, more parameters are necessary in the DeploymentSpec object:
+
+```
+from prefect.flow_runners import SubprocessFlowRunner
+from prefect.deployments import DeploymentSpec
+
+DeploymentSpec(
+    flow_location="basic.py",
+    flow_name="basic-api-call",
+    parameters={"url":"https://api.github.com"},
+    name="basic-deployment",
+    flow_runner=SubprocessFlowRunner(),
+)
+```
+
+<br>
+
+## Creating and running the deployment
+After this has been set up, create the deployment using:
+
+```
+$ prefect deployment create {file-name}
+```
+
+To then run this deployment from the CLI:
+
+```
+prefect deployment execute {flow-name}/{deployment-name}
+```
+
+where the {flow-name} and {deployment-name} can be found by running
+
+```
+prefect orion start
+```
+
+and going to deployments. It should also be displayed in the CLI when creating the deployment.
