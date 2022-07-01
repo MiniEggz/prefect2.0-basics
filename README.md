@@ -210,10 +210,16 @@ To change profile, use:
 $ prefect profile use {profile-name}
 ```
 
-All profiles are stored in /Users/{user-name}/.prefect/profiles.toml. To list them, simply:
+All profiles are stored in /Users/{user-name}/.prefect/profiles.toml. To list them with all information, use:
 
 ```
 $ cat ~/.prefect/profiles.toml
+```
+
+If you just want to see the names of the profiles, use:
+
+```
+$ prefect profile ls
 ```
 
 <br>
@@ -252,7 +258,7 @@ $ python3 duel_count.py
 
 <br>
 
-# Working with deployments (locally)
+# <a name="deployments"></a> Working with deployments
 Deployments encapsulate a flow and this allows it to be scheduled and triggered via the API. More on this can be found [here](https://orion-docs.prefect.io/concepts/deployments/).
 
 <br>
@@ -297,7 +303,7 @@ DeploymentSpec(
 )
 ```
 
-The SubProcessFlowRunner is useful when running things locally as there is less configuration. The UniversalFlowRunner (default option), for example, requires remote storage.
+The SubProcessFlowRunner is useful when running things locally or testing as there is less configuration. The UniversalFlowRunner (default option), for example, requires remote storage.
 
 <br>
 
@@ -335,7 +341,7 @@ DeploymentSpec(
 
 <br>
 
-## Creating and running the deployment
+## Creating and running the deployment locally
 After this has been set up, create the deployment using:
 
 ```
@@ -345,13 +351,22 @@ $ prefect deployment create {file-name}
 To then run this deployment from the CLI:
 
 ```
-prefect deployment execute {flow-name}/{deployment-name}
+$ prefect deployment execute {flow-name}/{deployment-name}
 ```
 
 where the {flow-name} and {deployment-name} can be found by running
 
 ```
-prefect orion start
+$ prefect orion start
 ```
 
 and going to deployments. It should also be displayed in the CLI when creating the deployment.
+
+<br>
+
+## Running the deployment using Prefect 2.0 cloud
+To run the deployment using Prefect 2.0 cloud, simply follow the instructions for doing the same locally but make sure to switch back to the cloud profile first using:
+
+```
+$ prefect profile use {cloud-profile-name}
+```
