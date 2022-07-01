@@ -307,6 +307,11 @@ The SubProcessFlowRunner is useful when running things locally or testing as the
 
 <br>
 
+### Note:
+The DeploymentSpec objects can be defined in a separate file if desired and multiple deployments can be defined within the same file.
+
+<br>
+
 ## Example using parameters
 Using basic.py as an example this time, we start with the code:
 
