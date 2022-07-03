@@ -21,6 +21,7 @@ DeploymentSpec(
     parameters={"url":"https://api.github.com"},
     name="basic-deployment",
     flow_runner=SubprocessFlowRunner(),
+    tags=["test"],
 )
 
 DeploymentSpec(

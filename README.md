@@ -375,3 +375,54 @@ To run the deployment using Prefect 2.0 cloud, simply follow the instructions fo
 ```
 $ prefect profile use {cloud-profile-name}
 ```
+
+<br>
+
+# Basic work queues and agents
+Work queues are just a queue of deployments to run. These flows are then picked up and executed by an agent that monitors a specific work queue.
+
+<br>
+
+Deployments can be linked to flows explicitly (using their ID) or they can be linked using tags. From here, deployments can either be scheduled, or they can be run through the Prefect 2.0 UI.
+
+<br>
+
+To create a work queue,
+
+```
+$ prefect work-queue create {queue-name}
+```
+
+If you want to add a tag or a deployment, you can do so with -t {tag-name} or -d {deployment-id} respectively, e.g:
+
+```
+$ prefect work-queue create -t {tag-name} {queue-name}
+```
+
+To list the work queues created, run:
+
+```
+$ prefect work-queue ls
+```
+
+After creating a work queue, create an agent to poll this work queue and run the deployments called:
+
+```
+prefect agent start {work-queue-id}
+```
+
+where {work-queue-id} can be found in the listing of work queues.
+
+<br>
+
+In the Prefect 2.0 UI, there is a chance add tags to both deployments and work queues, as well as add deployments straight into work queues. This allows agents polling that work queue to execute any of its deployments, when a request is sent by the user. 
+
+<br>
+
+If the cloud profile is being used, deployments can be run from the cloud interface. Otherwise, run
+
+```
+$ prefect orion start
+```
+
+and then go to [127.0.0.1:4200](127.0.0.1:4200) to access the UI.
