@@ -3,7 +3,9 @@
 ### Sections
 * [Setting up Prefect 2.0 locally](#local-setup)
 * [Setting up Prefect 2.0 cloud](#cloud-setup)
-* [Working with deployments](#deployments)
+* [Deployments](#deployments)
+* [Basic work queues and agents](#work-queues-agents)
+* [Schedules](#schedules)
 
 <br>
 
@@ -136,7 +138,7 @@ $ python3 tasks_example.py
 
 <br>
 
-## Looking at running tasks asychronously
+## Looking at running tasks concurrently
 
 Prefect 2.0 uses task runners that can run sequentially or concurrently. To illustrate this, this example shows two counts (one negative and one positive) to show that both tasks are being carried out at the same time.
 
@@ -197,7 +199,7 @@ Generate an API key by going to [beta.prefect.io/profile/api-keys](beta.prefect.
 
 <br>
 
-## Creating and using prefect profiles
+## Creating and using Prefect profiles
 Prefect profiles are good to switch between local work and work using Prefect cloud, or between different workspaces on the cloud. To set up profiles up using:
 
 ```
@@ -264,7 +266,7 @@ Deployments encapsulate a flow and this allows it to be scheduled and triggered 
 <br>
 
 ## Adding deployment specification
-Assuming a flow has already been written, to create a deployment, the script needs to first be modified.
+Assuming a flow has already been written, creating a deployment is simple and just requires a DeploymentSpec object.
 With duel_count.py as the starting point:
 
 ```
@@ -290,7 +292,7 @@ def duel_count():
     return
 ```
 
-The deployment object needs to be defined:
+The deployment object is defined like this:
 
 ```
 from prefect.flow_runners import SubprocessFlowRunner
@@ -308,7 +310,7 @@ The SubProcessFlowRunner is useful when running things locally or testing as the
 <br>
 
 ### Note:
-The DeploymentSpec objects can be defined in a separate file if desired and multiple deployments can be defined within the same file.
+The DeploymentSpec objects can be defined in a separate file and multiple deployments can be defined within the same file.
 
 <br>
 
@@ -378,8 +380,8 @@ $ prefect profile use {cloud-profile-name}
 
 <br>
 
-# Basic work queues and agents
-Work queues are just a queue of deployments to run. These flows are then picked up and executed by an agent that monitors a specific work queue.
+# <a name="work-queues-agents"></a> Basic work queues and agents
+Work queues are just a queue of deployments to run. These flows are picked up and executed by an agent that monitors a specific work queue.
 
 <br>
 
@@ -408,14 +410,14 @@ $ prefect work-queue ls
 After creating a work queue, create an agent to poll this work queue and run the deployments called:
 
 ```
-prefect agent start {work-queue-id}
+$ prefect agent start {work-queue-id}
 ```
 
 where {work-queue-id} can be found in the listing of work queues.
 
 <br>
 
-In the Prefect 2.0 UI, there is a chance add tags to both deployments and work queues, as well as add deployments straight into work queues. This allows agents polling that work queue to execute any of its deployments, when a request is sent by the user. 
+In the Prefect 2.0 UI, there is a chance add tags to both deployments and work queues, as well as add deployments straight into work queues. This allows agents polling that work queue to execute any of its deployments, when a request is sent by the user or a deployment is scheduled. 
 
 <br>
 
@@ -426,3 +428,55 @@ $ prefect orion start
 ```
 
 and then go to [127.0.0.1:4200](127.0.0.1:4200) to access the UI.
+
+<br>
+
+# <a name="schedules"></a> Working with schedules
+Schedules tell Prefect how often to run a specific flow and is defined in the DeploymentSpec object. There are three different schedule types: CronSchedule, IntervalSchedule, RRuleSchedule. Each schedule type is better for a different purpose; this example will use an IntervalSchedule.
+
+<br>
+
+Going back to basic.py, adding a schedule is as simple as adding a schedule parameter to the DeploymentSpec:
+
+```
+import requests
+from prefect import flow
+
+@flow
+def basic_func():
+    print("Something done here...")
+    return 152
+
+from prefect.flow_runners import SubprocessFlowRunner
+from prefect.deployments import DeploymentSpec
+from prefect.orion.schemas.schedules import IntervalSchedule
+from datetime import timedelta
+
+DeploymentSpec(
+    flow_location="basic.py",
+    flow_name="basic-func",
+    name="basic-func-deployment",
+    flow_runner=SubprocessFlowRunner(),
+    schedule=IntervalSchedule(interval=timedelta(seconds=30)),
+)
+```
+
+After building this deployment with:
+
+```
+$ prefect deployment create {file-name}
+```
+
+a work queue with:
+
+```
+$ prefect work-queue create {queue-name}
+```
+
+and then an agent for that work-queue with: 
+
+```
+$ prefect agent start {queue-id}
+```
+
+the flow will be run every 30 seconds by the agent. The results will be available to see in the UI. If a deployment should no longer be run and it has a schedule attached to it, this deployment should be paused in the UI, otherwise it will continue to be run on schedule (so long as the agent is active).

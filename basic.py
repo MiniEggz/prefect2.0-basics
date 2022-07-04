@@ -9,11 +9,14 @@ def basic_func():
 
 @flow
 def basic_api_call(url):
+    print("Basic api call")
     return requests.get(url).json()
 
 # deployments
 from prefect.flow_runners import SubprocessFlowRunner
 from prefect.deployments import DeploymentSpec
+from prefect.orion.schemas.schedules import IntervalSchedule
+from datetime import timedelta
 
 DeploymentSpec(
     flow_location="basic.py",
@@ -22,6 +25,7 @@ DeploymentSpec(
     name="basic-deployment",
     flow_runner=SubprocessFlowRunner(),
     tags=["test"],
+    schedule=IntervalSchedule(interval=timedelta(seconds=20)),
 )
 
 DeploymentSpec(
@@ -29,6 +33,7 @@ DeploymentSpec(
     flow_name="basic-func",
     name="basic-func-deployment",
     flow_runner=SubprocessFlowRunner(),
+    schedule=IntervalSchedule(interval=timedelta(seconds=30)),
 )
 
 # main
