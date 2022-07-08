@@ -1,6 +1,7 @@
 import requests
 from prefect import flow
 
+
 # flows
 @flow
 def basic_func():

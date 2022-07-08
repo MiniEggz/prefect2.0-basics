@@ -51,7 +51,7 @@ $ prefect version
 ## Installing requests for use in starter scripts
 
 ```
-pip install requests
+$ pip install requests
 ```
 
 <br>
@@ -70,7 +70,7 @@ $ touch flow_example.py
 
 and paste in this code:
 
-```
+```python
 import requests
 from prefect import flow
 
@@ -103,7 +103,7 @@ $ touch tasks_example.py
 
 Paste in the following code:
 
-```
+```python
 import requests
 from prefect import flow, task
 
@@ -152,7 +152,7 @@ $ touch duel_count.py
 
 Paste the following code in:
 
-```
+```python
 from prefect import flow, task
 from prefect.task_runners import ConcurrentTaskRunner
 
@@ -269,7 +269,7 @@ Deployments encapsulate a flow and this allows it to be scheduled and triggered 
 Assuming a flow has already been written, creating a deployment is simple and just requires a DeploymentSpec object.
 With duel_count.py as the starting point:
 
-```
+```python
 from prefect import flow, task
 from prefect.task_runners import ConcurrentTaskRunner
 
@@ -294,7 +294,7 @@ def duel_count():
 
 The deployment object is defined like this:
 
-```
+```python
 from prefect.flow_runners import SubprocessFlowRunner
 from prefect.deployments import DeploymentSpec
 
@@ -317,7 +317,7 @@ The DeploymentSpec objects can be defined in a separate file and multiple deploy
 ## Example using parameters
 Using basic.py as an example this time, we start with the code:
 
-```
+```python
 import requests
 from prefect import flow
 
@@ -333,7 +333,7 @@ def basic_api_call(url):
 
 Because there are multiple flows and because there is a parameter involved, more parameters are necessary in the DeploymentSpec object:
 
-```
+```python
 from prefect.flow_runners import SubprocessFlowRunner
 from prefect.deployments import DeploymentSpec
 
@@ -438,7 +438,7 @@ Schedules tell Prefect how often to run a specific flow and is defined in the De
 
 Going back to basic.py, adding a schedule is as simple as adding a schedule parameter to the DeploymentSpec:
 
-```
+```python
 import requests
 from prefect import flow
 
